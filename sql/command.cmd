@@ -1,0 +1,1 @@
+mysqldump -u root --default-character-set=utf8 -p community > community.sql

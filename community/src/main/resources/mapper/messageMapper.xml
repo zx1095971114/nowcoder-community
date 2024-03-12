@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nowcoder.community.dao.MessageMapper">
+    <sql id="allFieldsExceptId">
+        from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+    
+    <sql id="allFields">
+        id, <include refid="allFieldsExceptId"></include>
+    </sql>
+
+    <sql id="isPrivateValidMessage">
+        from_id != 1 and status != 2
+    </sql>
+    
+    <select id="selectConversationLastMessage" resultType="Message">
+        select <include refid="allFields"></include>
+        from message
+        where id in (
+            select max(id)
+            from message
+            where  from_id = #{userId}
+                or to_id = #{userId}
+                and <include refid="isPrivateValidMessage"></include>
+            group by conversation_id
+        )
+        order by id desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectConversationsCount">
+        select count(id)
+        from message
+        where id in (
+            select max(id)
+            from message
+            where  from_id = #{userId}
+                or to_id = #{userId}
+                and <include refid="isPrivateValidMessage"></include>
+            group by conversation_id
+        )
+    </select>
+
+    <select id="selectMessagesByConversationId" resultType="Message">
+        select <include refid="allFields"></include>
+        from message
+        where conversation_id = #{conversationId}
+            and <include refid="isPrivateValidMessage"></include>
+        order by id asc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectMessageCountByConversationId">
+        select count(id)
+        from message
+        where conversation_id = #{conversationId}
+            and <include refid="isPrivateValidMessage"></include>
+    </select>
+
+    <select id="selectUnreadCount">
+        select count(id)
+        from message
+        where to_id = #{userId}
+            and <include refid="isPrivateValidMessage"></include>
+            <if test="conversationId != null">
+                and conversation_id = #{conversationId}
+            </if>
+            and status = 0
+    </select>
+
+    <insert id="insertMessage" parameterType="Message" keyProperty="id">
+        insert into message(<include refid="allFieldsExceptId"></include>)
+        values(#{fromId}, #{toId}, #{conversationId}, #{content}, #{status}, #{createTime})
+    </insert>
+
+    <update id="updateMessagesStatus">
+        update message
+        set status = #{status}
+        where id in 
+        <foreach collection="messageIds" item="id" open="(" separator=", " close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="selectLastSystemMessageByTopic" resultType="Message">
+        select <include refid="allFields"></include>
+        from message
+        where id = (
+            select max(id)
+            from message
+            where from_id = 1
+                and to_id = #{userId}
+                and conversation_id = #{topic}
+                and status != 2
+        )
+    </select>
+    
+    <select id="selectCountOfTopicMessage">
+        select count(id)
+        from message
+        where from_id = 1
+            and to_id = #{userId}
+            and status != 2
+
+            <choose>
+                <when test="topic != null">
+                    and conversation_id = #{topic}
+                </when>
+                <when test="topic == null">
+                    and (conversation_id = 'topic_notice:tag_comment'
+                        or conversation_id = 'topic_notice:tag_like'
+                        or conversation_id = 'topic_notice:tag_follow')
+                </when>
+            </choose>
+<!--            <if test="topic != null">-->
+<!--                and conversation_id = #{topic}-->
+<!--            </if>-->
+    </select>
+
+    <select id="selectUnreadCountOfTopic">
+        select count(id)
+        from message
+        where from_id = 1
+            and to_id = #{userId}
+            and status = 0
+            <choose>
+                <when test="topic != null">
+                    and conversation_id = #{topic}
+                </when>
+                <when test="topic == null">
+                    and (conversation_id = 'topic_notice:tag_comment'
+                        or conversation_id = 'topic_notice:tag_like'
+                        or conversation_id = 'topic_notice:tag_follow')
+                </when>
+            </choose>
+            <!--            <if test="topic != null">-->
+            <!--                and conversation_id = #{topic}-->
+            <!--            </if>-->
+    </select>
+    
+    <select id="selectSystemMessageByTopic" resultType="Message">
+        select <include refid="allFields"></include>
+        from message
+        where to_id = #{userId}
+            and conversation_id = #{topic}
+            and status != 2
+            and from_id = 1
+        order by id desc
+        limit #{offset}, #{limit}
+    </select>
+</mapper>

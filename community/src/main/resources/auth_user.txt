@@ -1,0 +1,10 @@
+/comment/add_comment/{discussPostId}
+/discussPost/publish
+/follow
+/unfollow
+/like
+/logout(这里是因为要用我写好的逻辑，不用spring security自动设置的filter拦截logout，所以要设置，否则就不用了)
+/message/*
+/user/settings
+/user/uploadHeader
+/user/resetPassword

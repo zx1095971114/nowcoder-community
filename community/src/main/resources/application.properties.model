@@ -1,0 +1,75 @@
+#启用的配置文件
+spring.profiles.active=test
+
+#启用的日志配置文件
+logging.config=classpath:logback-spring-${spring.profiles.active}.xml
+
+# ServerProperties
+server.port=8080
+server.servlet.context-path=/community
+
+# ThymeleafProperties
+spring.thymeleaf.cache=${community.spring.thymeleaf.cache}
+
+# DataSourceProperties
+# jdbc
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=${community.spring.datasource.url}
+spring.datasource.username=${community.spring.datasource.username}
+spring.datasource.password=${community.spring.datasource.password}
+# 指定连接池
+spring.datasource.type=com.zaxxer.hikari.HikariDataSource
+# 指定最大连接数
+spring.datasource.hikari.maximum-pool-size=15
+# 指定最小的保持连接数
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=30000
+
+# MybatisProperties
+#mapper配置文件存放路径
+mybatis.mapper-locations=classpath:mapper/*.xml
+#数据表对应的实体类存放路径
+mybatis.type-aliases-package=com.nowcoder.community.entity
+#启用自动生成主键,启用后，在调用insert方法插入一个没有主键的值以后，会自动生成主键，并回填到对象中
+#但这个配置只对使用xml来写的mybatis有效，对用注解写的，还是要在@Options中声明
+mybatis.configuration.use-generated-keys=true
+#将数据库的下划线命名法转化为java的驼峰命名法
+mybatis.configuration.map-underscore-to-camel-case=true
+
+# 为更好地配置日志，使用logback-spring.xml来进行日志配置
+# 日志等级
+# logging.level.com.nowcoder.community.dao=debug
+
+# MailProperties
+spring.mail.host=
+spring.mail.port=
+spring.mail.username=
+spring.mail.password=
+spring.mail.protocol=smtps
+spring.mail.properties.mail.smtp.ssl.enable=true
+
+#redis配置
+spring.data.redis.host=${community.spring.data.redis.host}
+spring.data.redis.port=${community.spring.data.redis.port}
+spring.data.redis.password=${community.spring.data.redis.password}
+spring.data.redis.database=${community.spring.data.redis.database}
+#最大活跃连接数
+spring.data.redis.lettuce.pool.max-active=8
+#最大空闲连接数
+spring.data.redis.lettuce.pool.max-idle=8
+#最小空闲连接数
+spring.data.redis.lettuce.pool.min-idle=0
+#最大连接等待时间
+spring.data.redis.lettuce.pool.max-wait=300ms
+
+#RocketMQ配置，这里本来想用rocketmq-spring-boot-starter，但它不支持spring boot3.1.5，所以我使用原生的rocket-client
+rocketmq.name-server=${community.rocketmq.name-server}
+rocketmq.producer.group=pg_notice
+
+# 配置elasticsearch
+spring.elasticsearch.uris=http://xx.xx.xx.xx:9200
+spring.elasticsearch.socket-keep-alive=true
+
+# 配置域名，自用
+community.path.domain=${community.community.path.domain}
+community.path.upload=${community.community.path.upload}

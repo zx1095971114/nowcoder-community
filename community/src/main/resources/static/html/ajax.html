@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ajax</title>
+</head>
+<body>
+    <p>
+        <input type="button" value="send_ajax" onclick="send_ajax()" id="ajaxButton">
+    </p>
+
+
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script>
+    function send_ajax(){
+        $.post(
+            "/community/alpha/ajax",
+            {"name": "Frank", "age": 10},
+            function (data){
+                console.log(typeof data);
+                console.log(data);
+                let json = JSON.parse(data);
+                console.log(json);
+            }
+        )
+    }
+</script>
+</html>

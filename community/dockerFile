@@ -1,0 +1,11 @@
+# 基础镜像
+FROM openjdk:17-jdk-alpine
+# 创建目录
+RUN mkdir -p /root/community/logs
+# 设定时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# 拷贝jar包
+COPY community.jar /root/community/community.jar
+# 入口
+ENTRYPOINT ["java", "-jar", "/app.jar"]
